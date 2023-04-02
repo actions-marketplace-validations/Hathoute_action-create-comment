@@ -55,7 +55,7 @@ function run() {
                 ? github.context.issue.number
                 : parseInt(core.getInput('number'));
             let githubCommentId = null;
-            if (commentUid == undefined) {
+            if (commentUid != undefined) {
                 yield octokit.issues.listComments({
                     owner,
                     repo,

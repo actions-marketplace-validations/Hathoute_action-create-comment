@@ -23,7 +23,7 @@ async function run(): Promise<void> {
             : parseInt(core.getInput('number'));
 
     let githubCommentId = null;
-    if (commentUid == undefined) {
+    if (commentUid != undefined) {
       await octokit.issues.listComments({
         owner,
         repo,
