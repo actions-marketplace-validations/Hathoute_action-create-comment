@@ -48,21 +48,51 @@ function run() {
             if (core.getInput('repo')) {
                 [owner, repo] = core.getInput('repo').split('/');
             }
-            const number = core.getInput('number') === ''
+            const commentUid = core.getInput('comment_uid') === ''
+                ? undefined
+                : parseInt(core.getInput('comment_uid'));
+            const pullNumber = core.getInput('number') === ''
                 ? github.context.issue.number
                 : parseInt(core.getInput('number'));
-            yield octokit.issues.createComment({
-                owner,
-                repo,
-                issue_number: number,
-                body
-            });
+            let githubCommentId = null;
+            if (commentUid == undefined) {
+                yield octokit.issues.listComments({
+                    owner,
+                    repo,
+                    issue_number: pullNumber
+                }).then(payload => payload.data.filter(c => c.body.includes(`cid=${commentUid})`)))
+                    .then(comments => comments.map(c => c.id))
+                    .then(cid => githubCommentId = cid);
+            }
+            const commentBody = createCommentBody(body, commentUid);
+            if (githubCommentId == null) {
+                yield octokit.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: pullNumber,
+                    body: commentBody
+                });
+            }
+            else {
+                yield octokit.issues.updateComment({
+                    owner,
+                    repo,
+                    comment_id: githubCommentId,
+                    body: commentBody
+                });
+            }
         }
         catch (e) {
             core.error(e);
             core.setFailed(e.message);
         }
     });
+}
+function createCommentBody(body, commentUid) {
+    if (commentUid == undefined) {
+        return body;
+    }
+    return body + `\n\n[This comment is auto-generated](https://github.com/Hathoute/action-create-comment?cuid=${commentUid})`;
 }
 run();
 
