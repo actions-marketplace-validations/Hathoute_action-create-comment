@@ -9,25 +9,27 @@
 This is a GitHub Action to create a comment to an issue or a pull request.
 
 This action extract the number from an issue or a pull request which has triggered this by default.
-It means you don't need to care about something annoying like whether you should use `${{ github.event.issue.number }}` or `${{ github.event.pull_request.number }}`.
+It means you don't need to care about something annoying like whether you should use `${{ github.event.issue.number }}`
+or `${{ github.event.pull_request.number }}`.
 
 It would be more useful to use this with other GitHub Actions' outputs.
 
 ## Inputs
 
-|      NAME      |                          DESCRIPTION                          |   TYPE   | REQUIRED |                                     DEFAULT                                     |
-| -------------- | ------------------------------------------------------------- | -------- | -------- | ------------------------------------------------------------------------------- |
-| `github_token` | A GitHub token.                                               | `string` | `true`   | `N/A`                                                                           |
-| `body`         | The comment body.                                             | `string` | `true`   | `N/A`                                                                           |
-| `repo`         | The owner and repository name. e.g.) `Codertocat/Hello-World` | `string` | `false`  | `${{ github.repository }}`                                                      |
-| `number`       | The number of the issue or pull request.                      | `number` | `false`  | `${{ github.event.issue.number }}` or `${{ github.event.pull_request.number }}` |
+| NAME           | DESCRIPTION                                                              | TYPE     | REQUIRED | DEFAULT                                                                         |
+|----------------|--------------------------------------------------------------------------|----------|----------|---------------------------------------------------------------------------------|
+| `github_token` | A GitHub token.                                                          | `string` | `true`   | `N/A`                                                                           |
+| `body`         | The comment body.                                                        | `string` | `true`   | `N/A`                                                                           |
+| `repo`         | The owner and repository name. e.g.) `Codertocat/Hello-World`            | `string` | `false`  | `${{ github.repository }}`                                                      |
+| `number`       | The number of the issue or pull request.                                 | `number` | `false`  | `${{ github.event.issue.number }}` or `${{ github.event.pull_request.number }}` |
+| `comment_uid`  | The comment uid (will overwrite any existing comment with the same uid). | `number` | `false`  | `EMPTY (new untracked comment)`                                                 |
 
 ## Example
 
 ```yaml
 name: Create Comment
 
-on: [issue_comment]
+on: [ issue_comment ]
 
 jobs:
   create_comment:
@@ -51,10 +53,13 @@ Action Create Comment is released under the [Apache License 2.0](./LICENSE).
 <!-- badge links -->
 
 [actions-workflow-test]: https://github.com/actions-ecosystem/action-create-comment/actions?query=workflow%3ATest
+
 [actions-workflow-test-badge]: https://img.shields.io/github/workflow/status/actions-ecosystem/action-create-comment/Test?label=Test&style=for-the-badge&logo=github
 
 [release]: https://github.com/actions-ecosystem/action-create-comment/releases
+
 [release-badge]: https://img.shields.io/github/v/release/actions-ecosystem/action-create-comment?style=for-the-badge&logo=github
 
 [license]: LICENSE
+
 [license-badge]: <https://img.shields.io/github/license/actions-ecosystem/action-add-labels?style=for-the-badge>
