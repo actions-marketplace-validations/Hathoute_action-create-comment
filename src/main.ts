@@ -22,19 +22,28 @@ async function run(): Promise<void> {
             ? github.context.issue.number
             : parseInt(core.getInput('number'));
 
-    let githubCommentId = null;
+    let githubCommentId: number | null = null;
     if (commentUid != undefined) {
       await octokit.issues.listComments({
         owner,
         repo,
         issue_number: pullNumber
       }).then(payload => payload.data.filter(c => c.body.includes(`cid=${commentUid})`)))
-          .then(comments => comments.map(c => c.id))
-          .then(cid => githubCommentId = cid)
+          .then(comments => {
+            if (comments.length > 0) {
+              githubCommentId = comments[0].id;
+            }
+            if (comments.length > 1) {
+              core.debug(`Illegal State: Found multiple comments with the same comment_uid ${commentUid}`);
+              core.debug(`Will use the first github comment id found: ${githubCommentId}`)
+            }
+          })
     }
 
     const commentBody = createCommentBody(body, commentUid);
+    core.debug(`Comment body: ${commentBody}`);
     if (githubCommentId == null) {
+      core.debug(`Creating new comment`);
       await octokit.issues.createComment({
         owner,
         repo,
@@ -43,6 +52,7 @@ async function run(): Promise<void> {
       });
     }
     else {
+      core.debug(`Updating [comment_uid ${commentUid}, comment_id ${githubCommentId}]`);
       await octokit.issues.updateComment({
         owner,
         repo,

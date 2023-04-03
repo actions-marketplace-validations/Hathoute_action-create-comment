@@ -61,11 +61,20 @@ function run() {
                     repo,
                     issue_number: pullNumber
                 }).then(payload => payload.data.filter(c => c.body.includes(`cid=${commentUid})`)))
-                    .then(comments => comments.map(c => c.id))
-                    .then(cid => githubCommentId = cid);
+                    .then(comments => {
+                    if (comments.length > 0) {
+                        githubCommentId = comments[0].id;
+                    }
+                    if (comments.length > 1) {
+                        core.debug(`Illegal State: Found multiple comments with the same comment_uid ${commentUid}`);
+                        core.debug(`Will use the first github comment id found: ${githubCommentId}`);
+                    }
+                });
             }
             const commentBody = createCommentBody(body, commentUid);
+            core.debug(`Comment body: ${commentBody}`);
             if (githubCommentId == null) {
+                core.debug(`Creating new comment`);
                 yield octokit.issues.createComment({
                     owner,
                     repo,
@@ -74,6 +83,7 @@ function run() {
                 });
             }
             else {
+                core.debug(`Updating [comment_uid ${commentUid}, comment_id ${githubCommentId}]`);
                 yield octokit.issues.updateComment({
                     owner,
                     repo,
