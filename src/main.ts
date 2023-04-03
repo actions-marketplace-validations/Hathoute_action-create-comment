@@ -28,7 +28,7 @@ async function run(): Promise<void> {
         owner,
         repo,
         issue_number: pullNumber
-      }).then(payload => payload.data.filter(c => c.body.includes(`cid=${commentUid})`)))
+      }).then(payload => payload.data.filter(c => c.body.includes(`cuid=${commentUid})`)))
           .then(comments => {
             if (comments.length > 0) {
               githubCommentId = comments[0].id;
